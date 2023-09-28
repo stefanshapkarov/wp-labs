@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add course</title>
+</head>
+<body>
+
+<form method="post" action="/courses/add">
+    <label for="courseId">Course ID:</label>
+    <input type="text" id="courseId" name="id" th:value="${course != null ? course.id : null}" readonly/>
+
+    <label for="courseName">Course name:</label>
+    <input type="text" name="name" id="courseName" th:value="${course != null ? course.name : ''}" required/>
+
+    <label for="courseDescription">Course description:</label>
+    <input type="text" name="description" id="courseDescription" th:value="${course != null ? course.description : ''}"
+           required/>
+
+    <label for="teachers">Select teacher:</label>
+    <select id="teachers" name="teacherId">
+        <option th:each="teacher : ${teachers}" th:value="${teacher.id}" th:text="${teacher.getFullName()}"></option>
+    </select>
+    <input type='submit' value='Submit'/>
+</form>
+
+</body>
+</html>

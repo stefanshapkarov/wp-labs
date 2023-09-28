@@ -20,4 +20,8 @@ public class Teacher {
 
     public Teacher() {
     }
+
+    public String getFullName() {
+        return name + " " + surname;
+    }
 }

@@ -16,5 +16,7 @@ public interface CourseService {
 
     Course save(String name, String description, Long teacherId);
 
+    Course edit(Long courseId, String name, String description, Long teacherId);
+
     void delete(Long courseId);
 }

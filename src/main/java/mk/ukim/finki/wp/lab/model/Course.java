@@ -14,7 +14,7 @@ public class Course {
     Long id;
     String name;
     String description;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     List<Student> students;
     @ManyToOne
     Teacher teacher;
