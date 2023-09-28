@@ -13,7 +13,7 @@ public class Student {
     String password;
     String name;
     String surname;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     List<Course> courses;
 
     public Student(String username, String password, String name, String surname) {

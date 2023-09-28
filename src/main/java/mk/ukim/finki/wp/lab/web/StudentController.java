@@ -1,8 +1,10 @@
 package mk.ukim.finki.wp.lab.web;
 
 import mk.ukim.finki.wp.lab.model.Course;
+import mk.ukim.finki.wp.lab.model.Grade;
 import mk.ukim.finki.wp.lab.model.Student;
 import mk.ukim.finki.wp.lab.service.CourseService;
+import mk.ukim.finki.wp.lab.service.GradeService;
 import mk.ukim.finki.wp.lab.service.StudentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,17 +14,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = {"/students"})
 public class StudentController {
     StudentService studentService;
     CourseService courseService;
+    GradeService gradeService;
 
-    public StudentController(StudentService studentService, CourseService courseService) {
+    public StudentController(StudentService studentService, CourseService courseService, GradeService gradeService) {
         this.studentService = studentService;
         this.courseService = courseService;
+        this.gradeService = gradeService;
     }
 
     @GetMapping({"", "/AddStudent"})
@@ -69,9 +75,16 @@ public class StudentController {
         try {
             Course course = courseService.addStudentInCourse(username,
                     (Long) req.getSession().getAttribute("course"));
+            List<Student> students = course.getStudents();
+            Map<Student, Grade> gradesPerStudent = new HashMap<>();
+            students.forEach(s -> {
+                Grade grade = gradeService.getGradeByStudentAndCourse(s, course);
+                gradesPerStudent.put(s, grade);
+            });
 
-            model.addAttribute("courseName", course.getName());
-            model.addAttribute("students", course.getStudents());
+            model.addAttribute("course", course);
+            model.addAttribute("students", students);
+            model.addAttribute("gradesPerStudent", gradesPerStudent);
         } catch (RuntimeException e) {
             model.addAttribute("hasError", true);
             model.addAttribute("error", e.getMessage());

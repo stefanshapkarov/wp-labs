@@ -8,10 +8,13 @@
 <header>
     <h1>Students in Course </h1>
 </header>
-<section th:if="${courseName != null}">
+<section th:if="${course != null}">
     <div>Веб програмирање</div>
     <ul>
-        <li th:each="student : ${students}" th:text="${student.name}"></li>
+        <li th:each="student : ${students}"
+            th:text="|${student.name} - Grade: ${gradesPerStudent.get(student) != null ? gradesPerStudent.get(student).getGrade() : 'No grade'}|">
+        </li>
+    </ul>
     </ul>
     <a href="/courses/listCourses">Back</a>
 </section>

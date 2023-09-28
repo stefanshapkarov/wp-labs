@@ -3,6 +3,7 @@ package mk.ukim.finki.wp.lab.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -12,6 +13,8 @@ public class Teacher {
     Long id;
     String name;
     String surname;
+    private LocalDate dateOfEmployment;
+
 
     public Teacher(String name, String surname) {
         this.name = name;

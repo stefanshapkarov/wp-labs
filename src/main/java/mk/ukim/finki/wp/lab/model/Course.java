@@ -1,6 +1,7 @@
 package mk.ukim.finki.wp.lab.model;
 
 import lombok.Data;
+import mk.ukim.finki.wp.lab.model.enumeration.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ public class Course {
     Long id;
     String name;
     String description;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @Enumerated(EnumType.STRING)
+    private Type type;
+    @ManyToMany
     List<Student> students;
     @ManyToOne
     Teacher teacher;
