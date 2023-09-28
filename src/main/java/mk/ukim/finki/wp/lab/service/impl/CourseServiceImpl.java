@@ -1,48 +1,49 @@
 package mk.ukim.finki.wp.lab.service.impl;
 
+import mk.ukim.finki.wp.lab.exceptions.CourseNotFoundException;
+import mk.ukim.finki.wp.lab.exceptions.StudentAlreadyExistsException;
+import mk.ukim.finki.wp.lab.exceptions.TeacherNotFoundException;
 import mk.ukim.finki.wp.lab.model.Course;
 import mk.ukim.finki.wp.lab.model.Student;
 import mk.ukim.finki.wp.lab.repository.CourseRepository;
 import mk.ukim.finki.wp.lab.repository.StudentRepository;
+import mk.ukim.finki.wp.lab.repository.TeacherRepository;
 import mk.ukim.finki.wp.lab.service.CourseService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CourseServiceImpl implements CourseService {
     CourseRepository courseRepository;
     StudentRepository studentRepository;
+    TeacherRepository teacherRepository;
 
-    public CourseServiceImpl(CourseRepository courseRepository, StudentRepository studentRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, StudentRepository studentRepository,
+                             TeacherRepository teacherRepository) {
         this.courseRepository = courseRepository;
         this.studentRepository = studentRepository;
+        this.teacherRepository = teacherRepository;
     }
 
     @Override
     public List<Student> listStudentsByCourse(Long courseId) {
-        Course course = courseRepository.findById(courseId).orElse(null);
-        if (course != null) {
-            return course.getStudents();
-        }
-        return new ArrayList<>();
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
+
+        return course.getStudents();
     }
 
     @Override
     public Course addStudentInCourse(String username, Long courseId) {
-        Course course = courseRepository.findById(courseId).orElse(null);
-        Student student = null;
-        if (course != null) {
-            student = studentRepository.findStudentByUsername(username);
-            course.getStudents().add(student);
-            student.getCourses().add(course);
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
 
-            courseRepository.save(course);
-            studentRepository.save(student);
-            return course;
+        if (course.getStudents().stream().anyMatch(s -> s.getUsername().equals(username))) {
+            throw new StudentAlreadyExistsException(username);
         }
-        return null;
+        course.getStudents().add(studentRepository.findStudentByUsername(username));
+        return courseRepository.save(course);
     }
 
     @Override
@@ -52,6 +53,21 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course findById(Long courseId) {
-        return this.courseRepository.findById(courseId).orElse(null);
+        return this.courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
+    }
+
+    @Override
+    public Course save(String name, String description, Long teacherId) {
+        return courseRepository.save(new Course(name, description,
+                teacherRepository.findById(teacherId)
+                        .orElseThrow(() -> new TeacherNotFoundException(teacherId))));
+    }
+
+    @Override
+    public void delete(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
+        courseRepository.delete(course);
     }
 }

@@ -1,5 +1,6 @@
 package mk.ukim.finki.wp.lab.service.impl;
 
+import mk.ukim.finki.wp.lab.exceptions.StudentAlreadyExistsException;
 import mk.ukim.finki.wp.lab.model.Student;
 import mk.ukim.finki.wp.lab.repository.StudentRepository;
 import mk.ukim.finki.wp.lab.service.StudentService;
@@ -26,6 +27,9 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student save(String username, String password, String name, String surname) {
+        if (studentRepository.findAll().stream().anyMatch(s -> s.getUsername().equals(username))) {
+            throw new StudentAlreadyExistsException(username);
+        }
         return studentRepository.save(new Student(username, password, name, surname));
     }
 }

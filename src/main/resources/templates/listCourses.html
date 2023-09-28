@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <title>Welcome and Choose a Course</title>
@@ -25,6 +25,10 @@
         <br/>
         <button type="submit" class="btn btn-primary">Add Student</button>
     </form>
+
+    <div th:if="${hasError}">
+        <h1 th:text="${error}"></h1>
+    </div>
 </main>
 
 

@@ -26,7 +26,12 @@ public class StudentController {
     }
 
     @GetMapping({"", "/AddStudent"})
-    public String getStudents(HttpServletRequest req, Model model) {
+    public String getStudents(HttpServletRequest req,
+                              @RequestParam(required = false) String error, Model model) {
+        if (error != null && !error.isEmpty()) {
+            model.addAttribute("hasError", true);
+            model.addAttribute("error", error);
+        }
         List<Student> students = studentService.listAll();
         model.addAttribute("students", students);
         model.addAttribute("course", req.getSession().getAttribute("course"));
@@ -50,20 +55,28 @@ public class StudentController {
     public String createStudent(@RequestParam String username,
                                 @RequestParam String password,
                                 @RequestParam String name,
-                                @RequestParam String surname,
-                                Model model) {
-        studentService.save(username, password, name, surname);
-        model.addAttribute("success", "A new student has been added.");
-        return "redirect:/students/AddStudent";
+                                @RequestParam String surname) {
+        try {
+            studentService.save(username, password, name, surname);
+        } catch (RuntimeException e) {
+            return "redirect:/students?error=" + e.getMessage();
+        }
+        return "redirect:/students";
     }
 
     @PostMapping("/StudentEnrollmentSummary")
     public String getStudentEnrollmentSummary(HttpServletRequest req, @RequestParam String username, Model model) {
-        Course course = courseService.addStudentInCourse(username, (Long) req.getSession().getAttribute("course"));
-        if (course != null) {
+        try {
+            Course course = courseService.addStudentInCourse(username,
+                    (Long) req.getSession().getAttribute("course"));
+
             model.addAttribute("courseName", course.getName());
             model.addAttribute("students", course.getStudents());
+        } catch (RuntimeException e) {
+            model.addAttribute("hasError", true);
+            model.addAttribute("error", e.getMessage());
         }
+
         return "studentsInCourse";
     }
 }

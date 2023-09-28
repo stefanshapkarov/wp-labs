@@ -13,4 +13,8 @@ public interface CourseService {
     List<Course> findAll();
 
     Course findById(Long courseId);
+
+    Course save(String name, String description, Long teacherId);
+
+    void delete(Long courseId);
 }
